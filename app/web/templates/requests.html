@@ -1,0 +1,73 @@
+{{ define "content" }}
+<h2>All Requests</h2>
+
+<p>Viewing as: <strong>{{ .User.Email }}</strong></p>
+
+{{ if .Requests }}
+	{{ range .Requests }}
+	{{ $borderColor := "#ffc107" }}
+	{{ $bgColor := "#fff3cd" }}
+	{{ $textColor := "#856404" }}
+	{{ $statusText := "⏳ Pending" }}
+	{{ if eq .Status "approved" }}
+		{{ $borderColor = "#28a745" }}
+		{{ $bgColor = "#d4edda" }}
+		{{ $textColor = "#155724" }}
+		{{ $statusText = "✓ Approved" }}
+	{{ else if eq .Status "rejected" }}
+		{{ $borderColor = "#dc3545" }}
+		{{ $bgColor = "#f8d7da" }}
+		{{ $textColor = "#721c24" }}
+		{{ $statusText = "✗ Rejected" }}
+	{{ end }}
+	<div style="background: #f5f5f5; padding: 15px; margin: 15px 0; border-radius: 5px; border-left: 4px solid {{ $borderColor }};">
+		<h3 style="margin-top: 0;">Request: {{ .RequestID }}</h3>
+		<p style="margin: 5px 0;">
+			<strong>Status:</strong>
+			<span style="display: inline-block; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; background: {{ $bgColor }}; color: {{ $textColor }};">
+				{{ $statusText }}
+			</span>
+		</p>
+		<p style="margin: 5px 0;"><strong>Created by:</strong> {{ .CreatedBy }}</p>
+		<p style="margin: 5px 0;"><strong>Created at:</strong> {{ .CreatedAt.Format "2006-01-02 15:04:05" }}</p>
+		<p style="margin: 5px 0;"><strong>Description:</strong> {{ .Description }}</p>
+		{{ if .ApprovedBy }}
+			{{ if eq .Status "approved" }}
+			<p style="margin: 5px 0;"><strong>Approved by:</strong> {{ .ApprovedBy }}</p>
+			{{ if .ApprovedAt }}
+			<p style="margin: 5px 0;"><strong>Approved at:</strong> {{ .ApprovedAt.Format "2006-01-02 15:04:05" }}</p>
+			{{ end }}
+			{{ else if eq .Status "rejected" }}
+			<p style="margin: 5px 0;"><strong>Rejected by:</strong> {{ .ApprovedBy }}</p>
+			{{ if .ApprovedAt }}
+			<p style="margin: 5px 0;"><strong>Rejected at:</strong> {{ .ApprovedAt.Format "2006-01-02 15:04:05" }}</p>
+			{{ end }}
+			{{ end }}
+		{{ end }}
+
+		{{ if and (eq .Status "pending") $.CanApprove }}
+		<div style="margin-top: 10px; display: flex; gap: 10px;">
+			<form method="post" action="/approve/{{ .RequestID }}" style="margin: 0;">
+				<button type="submit" style="background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px;">
+					✓ Approve Request
+				</button>
+			</form>
+			<form method="post" action="/reject/{{ .RequestID }}" style="margin: 0;">
+				<button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px;">
+					✗ Reject Request
+				</button>
+			</form>
+		</div>
+		{{ end }}
+	</div>
+	{{ end }}
+{{ else }}
+	<div style="background: #e9ecef; padding: 20px; border-radius: 5px; text-align: center;">
+		<p style="margin: 0; color: #6c757d;">No requests found.</p>
+	</div>
+{{ end }}
+
+<div style="margin-top: 20px;">
+	<p><a href="/module" style="color: #007bff;">← Back to module</a></p>
+</div>
+{{ end }}
