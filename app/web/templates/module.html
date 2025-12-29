@@ -1,0 +1,81 @@
+{{ define "content" }}
+<h2>Shared Module</h2>
+
+{{ if .User.Email }}
+	<div style="background-color: #e8f5e9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+		<p style="margin: 5px 0;"><strong>User:</strong> {{ .User.Email }}</p>
+		<p style="margin: 5px 0;"><strong>Sub:</strong> <code>{{ .User.Sub }}</code></p>
+		<p style="margin: 5px 0;">
+			<strong>Groups:</strong>
+			{{ if .User.Groups }}
+				{{ range .User.Groups }}<code style="background-color: #fff; padding: 2px 6px; border-radius: 3px; margin-right: 5px;">{{ . }}</code>{{ end }}
+			{{ else }}
+				<em>none</em>
+			{{ end }}
+		</p>
+	</div>
+{{ else }}
+	<p style="color: #999;">No user in context.</p>
+{{ end }}
+
+<div style="margin-top: 30px;">
+	{{ if .IsAdmin }}
+		<div style="background-color: #d4edda; padding: 15px; border-radius: 5px; border-left: 4px solid #28a745; margin-bottom: 15px;">
+			<p style="margin: 0 0 10px 0;"><strong>🔑 Administrator</strong> - You have full access to all features.</p>
+			<form method="post" action="/create" style="margin-bottom: 10px;">
+				<input type="text" name="description" placeholder="Request description (optional)" style="padding: 8px; margin-right: 10px; border: 1px solid #ccc; border-radius: 4px; min-width: 300px;">
+				<button type="submit" style="background-color: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;">
+					Create Request
+				</button>
+			</form>
+			<div>
+				<a href="/requests" style="display: inline-block; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px; font-size: 16px; margin-right: 10px;">
+					View All Requests
+				</a>
+			</div>
+		</div>
+	{{ else if .CanCreateRequest }}
+		<div style="background-color: #d1ecf1; padding: 15px; border-radius: 5px; border-left: 4px solid #0c5460; margin-bottom: 15px;">
+			<p style="margin: 0 0 10px 0;"><strong>✓ Request Creator</strong> - You can create requests and view all requests.</p>
+			<form method="post" action="/create" style="margin-bottom: 10px;">
+				<input type="text" name="description" placeholder="Request description (optional)" style="padding: 8px; margin-right: 10px; border: 1px solid #ccc; border-radius: 4px; min-width: 300px;">
+				<button type="submit" style="background-color: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;">
+					Create Request
+				</button>
+			</form>
+			<div>
+				<a href="/requests" style="display: inline-block; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px; font-size: 16px;">
+					View All Requests
+				</a>
+			</div>
+		</div>
+	{{ end }}
+
+	{{ if .CanApprove }}
+		<div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; border-left: 4px solid #ffc107; margin-bottom: 15px;">
+			<p style="margin: 0 0 10px 0;"><strong>✓ Reviewer</strong> - You can review and approve requests, and view all requests.</p>
+			<p style="margin: 0 0 10px 0; color: #856404;">Go to the requests page to approve individual requests.</p>
+			<a href="/requests" style="display: inline-block; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px; font-size: 16px;">
+				View All Requests
+			</a>
+		</div>
+	{{ end }}
+
+	{{ if .IsViewerOnly }}
+		<div style="background-color: #e9ecef; padding: 15px; border-radius: 5px; border-left: 4px solid #6c757d; margin-bottom: 15px;">
+			<p style="margin: 0 0 10px 0;"><strong>✓ Viewer</strong> - You have read-only access. You can view all requests but cannot create or approve them.</p>
+			<a href="/requests" style="display: inline-block; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px; font-size: 16px;">
+				View All Requests
+			</a>
+		</div>
+	{{ else if not .CanView }}
+		<div style="background-color: #f8d7da; padding: 15px; border-radius: 5px; border-left: 4px solid #dc3545;">
+			<p style="margin: 0;"><strong>✗ No Permissions</strong> - You don't have any permissions assigned.</p>
+		</div>
+	{{ end }}
+</div>
+
+<div style="margin-top: 20px;">
+	<p><a href="/whoami" style="color: #007bff;">View detailed user info</a></p>
+</div>
+{{ end }}
